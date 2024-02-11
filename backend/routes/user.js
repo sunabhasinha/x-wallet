@@ -14,7 +14,7 @@ const signUpSchema = zod.object({
 });
 
 async function handleUserSignUp(req, res) {
-	const { username, firstName, lastName, password } = req.body;
+	const { username } = req.body;
 
 	const success = signUpSchema.safeParse(req.body);
 	if (!success) {
@@ -29,11 +29,14 @@ async function handleUserSignUp(req, res) {
 
 	if (!user._id) {
 		return res.json({
-			message: 'Email already taken / Incorrect inputs',
+			message: 'No user found',
 		});
 	}
-
-	const dbUser = await User.create(req.body);
+	const userData = {
+		...req.body,
+		balance: Math.floor(Math.random() * 10000) + 1,
+	};
+	const dbUser = await User.create(userData);
 	const token = jwt.sign(
 		{
 			userId: dbUser._id,
